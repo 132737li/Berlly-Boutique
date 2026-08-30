@@ -214,12 +214,15 @@ section h2 {
     max-width: 600px;
     margin: 0 auto 30px;
 }
-
+.search-box:hover{
+    border: 2px solid #da1060;
+    border-radius: 5px;
+}
 .search-box input {
     width: 100%;
     padding: 14px;
     border: 1px solid #1f1818;
-    border-radius: 6px;
+    border-radius: 5px;
     font-size: 16px;
     outline: none;
 }
@@ -337,6 +340,7 @@ form input:hover,
 form textarea:hover,
 form select:hover {
     border-color: #da1060;
+    background-image: url("../images/produits/backroung1.jpeg");
 }
 
 .promotion {
