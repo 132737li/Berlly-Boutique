@@ -304,13 +304,13 @@ section h2 {
     color: #16010a;
     font-size: 20px;
     margin: auto;
-    background-image: url("../images/produits/backroung1.jpeg");
+    background-color: #e7e2e2;
+    border-radius: 5px;
 }
 .contact:hover{
     color: black;
-    
     border-radius: 5px;
-    background: url("../images/produits/contact.png");
+    background-color: #dfaeae;
     transform: translateY(-8px);
 }
 
@@ -340,7 +340,7 @@ form input:hover,
 form textarea:hover,
 form select:hover {
     border-color: #da1060;
-    background-image: url("../images/produits/backroung1.jpeg");
+    background-color: #e2d9d9;
 }
 
 .promotion {
