@@ -35,9 +35,11 @@
                 <li><a href="contact.html">
                     <i class="fa-solid fa-envelope"></i>
                      Contact</a></li>
-                <li><a href="panier.html">
+                <li><a href="panier.html" class="cart-icon-wrap">
                     <i class="fa-solid fa-cart-shopping"></i>
-                     Panier</a></li>
+                     Panier
+                     <span class="cart-count">0</span>
+                </a></li>
             </ul>
         </nav>
 
@@ -64,7 +66,7 @@
                 </p>
 
                 <p>
-                    Cette crème hydratante aide à maintenir
+                    Cette crème hydratante vous aide à maintenir
                     une peau douce et hydratée.
                 </p>
 
@@ -74,15 +76,22 @@
                 </p>
 
 
-                <label for="quantity">
+                <label for="product-qty">
                     Quantité :
                 </label>
 
-                <input type="number" value="1" min="1">
+                <div class="qty-selector">
+                    <button type="button" onclick="changeProductQty(-1)">−</button>
+                    <input type="number" id="product-qty" value="1" min="1" oninput="updateProductSubtotal()">
+                    <button type="button" onclick="changeProductQty(1)">+</button>
+                </div>
 
-                <br><br>
+                <p class="subtotal-line">
+                    Sous-total :
+                    <span id="product-subtotal" data-price="25000">25 000 FBu</span>
+                </p>
 
-                <button>
+                <button onclick="addProductToCart('creme-hydratante-detail', 'Crème hydratante', 25000, 'images/produits/creme hydratantes.jpg')">
                     Ajouter au panier
                 </button>
 
@@ -156,6 +165,8 @@
     </div>
 
 </footer>
+
+    <script src="js/cart.js"></script>
 
 </body>
 

@@ -32,8 +32,10 @@
                         <i class="fa-solid fa-info-circle"></i> À propos</a></li>
                 <li><a href="contact.html">
                         <i class="fa-solid fa-envelope"></i> Contact</a></li>
-                <li><a href="panier.html">
-                        <i class="fa-solid fa-cart-shopping"></i> Panier</a></li>
+                <li><a href="panier.html" class="cart-icon-wrap">
+                        <i class="fa-solid fa-cart-shopping"></i> Panier
+                        <span class="cart-count">0</span>
+                    </a></li>
             </ul>
         </nav>
 
@@ -76,7 +78,7 @@
                         Prix: 80 000 FBu
                     </p>
 
-                    <button>
+                    <button onclick="addToCart('parfum-chanel', 'Chanel', 80000, 'images/produits/chanel.jpg')">
                         Ajouter au panier
                     </button>
 
@@ -93,7 +95,7 @@
                         Prix: 50 000 FBu
                     </p>
 
-                    <button>
+                    <button onclick="addToCart('parfum-moonlight', 'Moon Light', 50000, 'images/produits/moonlight.jpg')">
                         Ajouter au panier
                     </button>
 
@@ -110,7 +112,7 @@
                         Prix: 30 000 FBu
                     </p>
 
-                    <button>
+                    <button onclick="addToCart('parfum-revelry', 'Revelry', 30000, 'images/produits/reverly.jpg')">
                         Ajouter au panier
                     </button>
 
@@ -138,8 +140,6 @@
                 <i class="fa-solid fa-envelope"></i>
                 lirakoze602@gmail.com
             </p>
-
-        </div>
 
         </div>
 
@@ -184,6 +184,8 @@
         </div>
 
     </footer>
+
+    <script src="js/cart.js"></script>
 
 </body>
 

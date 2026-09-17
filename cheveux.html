@@ -32,8 +32,10 @@
                         <i class="fa-solid fa-info-circle"></i> À propos</a></li>
                 <li><a href="contact.html">
                         <i class="fa-solid fa-envelope"></i> Contact</a></li>
-                <li><a href="panier.html">
-                        <i class="fa-solid fa-cart-shopping"></i> Panier</a></li>
+                <li><a href="panier.html" class="cart-icon-wrap">
+                        <i class="fa-solid fa-cart-shopping"></i> Panier
+                        <span class="cart-count">0</span>
+                    </a></li>
             </ul>
         </nav>
 
@@ -76,7 +78,7 @@
                         Prix: 20 000 FBu
                     </p>
 
-                    <button>
+                    <button onclick="addToCart('champoing', 'Champoing', 20000, 'images/produits/champoing.jpg')">
                         Ajouter au panier
                     </button>
 
@@ -93,7 +95,7 @@
                         Prix: 30 000 FBu
                     </p>
 
-                    <button>
+                    <button onclick="addToCart('huile-capillaire', 'Huile capillaire', 30000, 'images/produits/huile capillaire.jpg')">
                         Ajouter au panier
                     </button>
 
@@ -110,7 +112,7 @@
                         Prix: 25 000 FBu
                     </p>
 
-                    <button>
+                    <button onclick="addToCart('masque-capillaire', 'Masque capillaire', 25000, 'images/produits/hair masque.jpg')">
                         Ajouter au panier
                     </button>
 
@@ -127,7 +129,7 @@
 
         <div class="footer-section">
 
-            <h3>Contactez-nous</h3>
+            <h3>contactez-nous</h3>
 
             <p>
                 <i class="fa-solid fa-phone"></i>
@@ -138,8 +140,6 @@
                 <i class="fa-solid fa-envelope"></i>
                 lirakoze602@gmail.com
             </p>
-
-        </div>
 
         </div>
 
@@ -183,6 +183,8 @@
         </div>
 
     </footer>
+
+    <script src="js/cart.js"></script>
 
 </body>
 

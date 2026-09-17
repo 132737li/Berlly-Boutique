@@ -32,8 +32,10 @@
                         <i class="fa-solid fa-info-circle"></i> À propos</a></li>
                 <li><a href="contact.html">
                         <i class="fa-solid fa-envelope"></i> Contact</a></li>
-                <li><a href="panier.html">
-                        <i class="fa-solid fa-cart-shopping"></i> Panier</a></li>
+                <li><a href="panier.html" class="cart-icon-wrap">
+                        <i class="fa-solid fa-cart-shopping"></i> Panier
+                        <span class="cart-count">0</span>
+                    </a></li>
             </ul>
         </nav>
     
@@ -76,7 +78,7 @@
                         Prix: 30 000 FBu
                     </p>
 
-                    <button>
+                    <button onclick="addToCart('serum-visage', 'Sérum visage', 30000, 'images/produits/serum facial.jpeg')">
                         Ajouter au panier
                     </button>
 
@@ -93,7 +95,7 @@
                         Prix: 25 000 FBu
                     </p>
 
-                    <button>
+                    <button onclick="addToCart('creme-hydratante', 'Crème hydratante', 25000, 'images/produits/creme hydratante.jpg')">
                         Ajouter au panier
                     </button>
 
@@ -110,7 +112,7 @@
                         Prix: 20 000 FBu
                     </p>
 
-                    <button>
+                    <button onclick="addToCart('gel-nettoyant', 'Gel nettoyant', 20000, 'images/produits/Gel nettoyant.jpg')">
                         Ajouter au panier
                     </button>
 
@@ -138,8 +140,6 @@
                 <i class="fa-solid fa-envelope"></i>
                 lirakoze602@gmail.com
             </p>
-    
-        </div>
     
         </div>
     
@@ -184,7 +184,9 @@
         </div>
     
     </footer>
-    
+
+    <script src="js/cart.js"></script>
+
 </body>
     
 </html>

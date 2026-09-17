@@ -32,8 +32,10 @@
                     <i class="fa-solid fa-info-circle"></i> À propos</a></li>
                 <li><a href="contact.html">
                     <i class="fa-solid fa-envelope"></i> Contact</a></li>
-                <li><a href="panier.html">
-                    <i class="fa-solid fa-cart-shopping"></i> Panier</a></li>
+                <li><a href="panier.html" class="cart-icon-wrap">
+                    <i class="fa-solid fa-cart-shopping"></i> Panier
+                    <span class="cart-count">0</span>
+                </a></li>
             </ul>
         </nav>
 
@@ -46,13 +48,17 @@
 
             <h1>Mon panier</h1>
 
+            <div id="cart-items">
+                <!-- Les articles du panier sont générés automatiquement -->
+            </div>
+
             <div class="cart-total">
 
                 <h2>
                     <label for="">
                         Total :
                     </label>
-                    <span >
+                    <span id="cart-total-value">
                         0 FBu
                     </span>
                 </h2>
@@ -128,6 +134,8 @@
         </div>
     
     </footer>
+
+    <script src="js/cart.js"></script>
 
 </body>
 

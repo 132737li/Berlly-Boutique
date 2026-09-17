@@ -31,8 +31,10 @@
                     <i class="fa-solid fa-info-circle"></i> À propos</a></li>
                 <li><a href="contact.html">
                     <i class="fa-solid fa-envelope"></i> Contact</a></li>
-                <li><a href="panier.html">
-                    <i class="fa-solid fa-cart-shopping"></i> Panier</a></li>
+                <li><a href="panier.html" class="cart-icon-wrap">
+                    <i class="fa-solid fa-cart-shopping"></i> Panier
+                    <span class="cart-count">0</span>
+                </a></li>
             </ul>
         </nav>
 
@@ -108,7 +110,7 @@
                     <p class="price">
                      Prix:   10 000 FBu</p>
 
-                    <button>
+                    <button onclick="addToCart('hair-remover', 'Hair remover', 10000, 'images/produits/Hair remover.jpg')">
                         Ajouter au panier
                     </button>
 
@@ -124,7 +126,7 @@
                     <p class="price">
                         Prix: 10 000 FBu</p>
 
-                    <button>
+                    <button onclick="addToCart('lip-gloss', 'Lip Gloss', 10000, 'images/produits/Lip gloss.jpg')">
                         Ajouter au panier
                     </button>
 
@@ -139,7 +141,7 @@
                     <p class="price">
                         Prix: 10 000 FBu</p>
 
-                    <button>
+                    <button onclick="addToCart('parfum-populaire', 'Parfum', 10000, 'images/produits/Parfum.jpg')">
                         Ajouter au panier
                     </button>
 
@@ -184,8 +186,6 @@
     
             </div>
     
-        </div>
-    
         <div class="social-media">
     
             <h3>Suivez-nous</h3>
@@ -225,6 +225,8 @@
         </div>
     
     </footer>
+
+    <script src="js/cart.js"></script>
 
 </body>
 

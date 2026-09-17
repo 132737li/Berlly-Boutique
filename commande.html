@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Berlly Boutique - Commander</title>
+    <title>Berlly Boutique - Commande</title>
 
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -35,9 +35,11 @@
                 <li><a href="contact.html">
                     <i class="fa-solid fa-envelope"></i>
                     Contact</a></li>
-                <li><a href="panier.html">
+                <li><a href="panier.html" class="cart-icon-wrap">
                     <i class="fa-solid fa-cart-shopping"></i>
-                    Panier</a></li>
+                    Panier
+                    <span class="cart-count">0</span>
+                </a></li>
             </ul>
         </nav>
 
@@ -50,38 +52,53 @@
 
             <h1>Finaliser la commande</h1>
 
-            <form>
+            <div class="order-summary">
 
-                <label for="name">
+                <h2>Récapitulatif de votre commande</h2>
+
+                <div id="order-items">
+                    <!-- Généré automatiquement à partir du panier -->
+                </div>
+
+                <div class="order-total">
+                    <span>Total à payer</span>
+                    <span id="order-total-value">0 FBu</span>
+                </div>
+
+            </div>
+
+            <form onsubmit="return handleOrderSubmit(event)">
+
+                <label for="order-name">
                     <i class="fa-solid fa-user"></i>
                     Nom complet
                 </label>
 
-                <input type="text" required placeholder="Entrez votre nom complet">
+                <input type="text" id="order-name" required placeholder="Entrez votre nom complet">
 
 
-                <label for="phone">
+                <label for="order-phone">
                     <i class="fa-solid fa-phone"></i>
                     Téléphone
                 </label>
 
-                <input type="tel"required placeholder="Entrez votre numéro de téléphone: +257 XX XX XX XX">
+                <input type="tel" id="order-phone" required placeholder="Entrez votre numéro de téléphone: +257 XX XX XX XX">
 
 
-                <label for="address">
+                <label for="order-address">
                     <i class="fa-solid fa-house"></i>
                     Adresse habituelle
                 </label>
 
-                <textarea required placeholder="Entrez votre adresse habituelle (ex: 15 Rue de Marie, ville ou quartier, Maison n°04)"></textarea>
+                <textarea id="order-address" required placeholder="Entrez votre adresse habituelle (ex: 15 Rue de Marie, ville ou quartier, Maison n°04)"></textarea>
 
 
-                <label for="payment">
+                <label for="payment-method">
                     <i class="fa-solid fa-credit-card"></i>
                     Mode de paiement
                 </label>
 
-                <select>
+                <select id="payment-method" onchange="togglePaymentDetails()">
 
                     <option value="lumicash">
                         Lumicash
@@ -100,6 +117,48 @@
                     </option>
 
                 </select>
+
+                <!-- Détails Lumicash -->
+                <div id="details-lumicash" class="payment-details">
+                    <p>
+                        📲 Envoyez le montant total via <strong>Lumicash</strong> au numéro :
+                        <strong>+257 67 52 97 51</strong>
+                    </p>
+                    <p>Une fois le paiement effectué, entrez ci-dessous le code de transaction reçu par SMS :</p>
+                    <label for="ref-lumicash">Code de transaction Lumicash</label>
+                    <input type="text" id="ref-lumicash" data-required="true" placeholder="Ex: LMC123456789">
+                </div>
+
+                <!-- Détails Ecocash -->
+                <div id="details-ecocash" class="payment-details">
+                    <p>
+                        📲 Envoyez le montant total via <strong>Ecocash</strong> au numéro :
+                        <strong>+257 76 67 23 87</strong>
+                        
+                    </p>
+                    <p>Une fois le paiement effectué, entrez ci-dessous le code de transaction reçu par SMS :</p>
+                    <label for="ref-ecocash">Code de transaction Ecocash</label>
+                    <input type="text" id="ref-ecocash" data-required="true" placeholder="Ex: ECO123456789">
+                </div>
+
+                <!-- Détails PayPal -->
+                <div id="details-paypal" class="payment-details">
+                    <p>
+                        💳 Envoyez le montant total via PayPal à l'adresse :
+                        <strong>lirakoze602@gmail.com</strong>
+                    </p>
+                    <p>
+                        Après votre commande, vous recevrez la confirmation et les instructions finales
+                        directement sur WhatsApp.
+                    </p>
+                </div>
+
+                <!-- Détails paiement à la livraison -->
+                <div id="details-cash" class="payment-details">
+                    <p>
+                        💵 Vous payez en espèces directement au livreur, à la réception de votre commande.
+                    </p>
+                </div>
 
 
                 <button type="submit">
@@ -173,6 +232,8 @@
     </div>
 
 </footer>
+
+    <script src="js/cart.js"></script>
 
 </body>
 
