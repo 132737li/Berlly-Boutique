@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Berlly Boutique - Tableau de bord</title>
+
+    <link rel="stylesheet" href="css/admin.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+
+<body>
+
+    <div class="admin-layout">
+
+        <!-- MENU ADMIN -->
+
+        <aside class="sidebar">
+
+            <div class="admin-logo">
+                <i class="fa-solid fa-store"></i>
+                <span>Berlly Boutique</span>
+            </div>
+
+            <nav>
+
+                <a href="dashboard.html" class="active">
+                    <i class="fa-solid fa-chart-line"></i>
+                    Tableau de bord
+                </a>
+
+                <a href="commandes.html">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    Commandes
+                </a>
+
+                <a href="../index.html">
+                    <i class="fa-solid fa-globe"></i>
+                    Voir le site
+                </a>
+
+                <button id="logout-button" class="logout-button">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    Déconnexion
+                </button>
+
+            </nav>
+
+        </aside>
+
+
+        <!-- CONTENU -->
+
+        <main class="admin-main">
+
+            <header class="admin-header">
+
+                <div>
+                    <h1>Tableau de bord</h1>
+
+                    <p>
+                        Bienvenue dans l'administration de Berlly Boutique.
+                    </p>
+                </div>
+
+            </header>
+
+
+            <!-- STATISTIQUES -->
+
+            <section class="stats">
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                    </div>
+
+                    <div>
+                        <span>Total commandes</span>
+                        <strong id="total-orders">0</strong>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+
+                    <div>
+                        <span>En attente</span>
+                        <strong id="pending-orders">0</strong>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+
+                    <div>
+                        <span>Confirmées</span>
+                        <strong id="confirmed-orders">0</strong>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-money-bill-wave"></i>
+                    </div>
+
+                    <div>
+                        <span>Chiffre total</span>
+                        <strong id="total-sales">0 FBu</strong>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- DERNIÈRES COMMANDES -->
+
+            <section class="admin-section">
+
+                <div class="section-title">
+
+                    <h2>Dernières commandes</h2>
+
+                    <a href="commandes.html" class="view-all">
+                        Voir toutes
+                    </a>
+
+                </div>
+
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>ID</th>
+                                <th>Client</th>
+                                <th>Téléphone</th>
+                                <th>Total</th>
+                                <th>Date</th>
+                                <th>Statut</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="recent-orders">
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <script src="js/admin.js"></script>
+
+</body>
+
+</html>

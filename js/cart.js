@@ -1,6 +1,4 @@
-/* ============================================
-   Berlly Boutique - Gestion du panier & commande
-   ============================================ */
+/* --- Berlly Boutique - Gestion du panier & commande --- */
 
 const CART_KEY = 'berlly_cart';
 const WHATSAPP_NUMBER = '25776672387'; // numéro WhatsApp de la boutique
@@ -262,11 +260,86 @@ function handleOrderSubmit(event) {
     }
 
     // Sauvegarde locale de la dernière commande (utile pour un futur suivi)
-    localStorage.setItem('berlly_last_order', JSON.stringify({
+    /* ---------- Enregistrement de la commande ---------- */
+
+const ORDERS_KEY = 'berlly_orders';
+
+const orders = JSON.parse(
+    localStorage.getItem(ORDERS_KEY) || '[]'
+);
+/*
+const newOrder = {
+    id: 'CMD-' + Date.now(),
+
+    name: name,
+    phone: phone,
+    address: address,
+
+    cart: cart,
+
+    total: total,
+
+    payment: paymentLabel,
+
+    transactionRef: transactionRef,
+
+    date: new Date().toISOString(),
+
+    status: 'En attente'
+};
+*/
+const currentUser =
+    JSON.parse(
+        localStorage.getItem('berlly_current_user')
+    );
+
+const newOrder = {
+
+    id: 'CMD-' + Date.now(),
+
+    userId: currentUser ? currentUser.id : null,
+
+    email: currentUser ? currentUser.email : null,
+
+    name: name,
+
+    phone: phone,
+
+    address: address,
+
+    cart: cart,
+
+    total: total,
+
+    payment: paymentLabel,
+
+    transactionRef: transactionRef,
+
+    date: new Date().toISOString(),
+
+    status: 'En attente'
+};
+
+/* Ajouter la nouvelle commande à l'historique */
+orders.push(newOrder);
+
+/* Sauvegarder toutes les commandes */
+localStorage.setItem(
+    ORDERS_KEY,
+    JSON.stringify(orders)
+);
+
+/* Garder aussi la dernière commande */
+localStorage.setItem(
+    'berlly_last_order',
+    JSON.stringify(newOrder)
+);
+   /* localStorage.setItem('berlly_last_order', JSON.stringify({
         name, phone, address, cart, total,
         payment: paymentLabel, transactionRef,
         date: new Date().toISOString()
-    }));
+    }));*/
+
 
     clearCart();
 

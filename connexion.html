@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - Berlly Boutique</title>
+
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+
+<body>
+
+    <div class="auth-container">
+
+        <div class="auth-card">
+
+            <div class="auth-logo">
+                <h1>Berlly Boutique</h1>
+                <p>Bienvenue</p>
+            </div>
+
+            <h2>Se connecter</h2>
+
+            <form id="login-form">
+
+                <div class="form-group">
+                    <label for="login-email">Adresse e-mail</label>
+                    <input type="email" id="login-email" placeholder="Votre adresse e-mail" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="login-password">Mot de passe</label>
+
+                    <div class="password-box">
+                        <input type="password" id="login-password" placeholder="Votre mot de passe" required>
+
+                        <button type="button" class="show-password" onclick="togglePassword('login-password', this)">
+                            👁
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-options">
+                    <label class="remember">
+                        <input type="checkbox" id="remember-me">
+                        Se souvenir de moi
+                    </label>
+
+                    <a href="mot-de-passe-oublie.html">
+                        Mot de passe oublié ?
+                    </a>
+                </div>
+
+                <button type="submit" class="auth-btn">
+                    Se connecter
+                </button>
+
+            </form>
+
+            <p class="auth-message" id="login-message"></p>
+
+            <div class="auth-footer">
+                <p>
+                    Vous n'avez pas encore de compte ?
+                    <a href="inscription.html">Créer un compte</a>
+                </p>
+
+                <p>
+                    <a href="index.html">← Retour à la boutique</a>
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="js/auth.js"></script>
+
+</body>
+
+</html>

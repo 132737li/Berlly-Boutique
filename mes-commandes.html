@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Mes commandes - Berlly Boutique</title>
+
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+
+<body>
+
+<div class="orders-container">
+
+    <div class="orders-header">
+
+        <div>
+            <h1>Berlly Boutique</h1>
+            <p>Historique de mes commandes</p>
+        </div>
+
+        <div class="orders-links">
+            <a href="profil.html">👤 Mon profil</a>
+            <a href="index.html">🏠 Boutique</a>
+        </div>
+
+    </div>
+
+
+    <div class="orders-card">
+
+        <div class="orders-title">
+
+            <h2>📦 Mes commandes</h2>
+
+            <button
+                type="button"
+                class="refresh-btn"
+                onclick="renderMyOrders()"
+            >
+                🔄 Actualiser
+            </button>
+
+        </div>
+
+
+        <div id="my-orders">
+
+            <p class="loading">
+                Chargement de vos commandes...
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Fenêtre détails commande -->
+
+<div
+    id="order-modal"
+    class="order-modal"
+>
+
+    <div class="order-modal-content">
+
+        <button
+            type="button"
+            class="close-modal"
+            onclick="closeOrderModal()"
+        >
+            ×
+        </button>
+
+        <h2>Détails de la commande</h2>
+
+        <div id="order-details"></div>
+
+    </div>
+
+</div>
+
+
+<script src="js/auth.js"></script>
+
+<script>
+
+/* =====================================================
+   MES COMMANDES - BERLLY BOUTIQUE
+   ===================================================== */
+
+const ORDERS_KEY = 'berlly_orders';
+const CURRENT_USER_KEY = 'berlly_current_user';
+
+
+/* ---------- Récupérer l'utilisateur connecté ---------- */
+
+function getCurrentUser() {
+
+    const data =
+        localStorage.getItem(CURRENT_USER_KEY);
+
+    if (!data) {
+        return null;
+    }
+
+    return JSON.parse(data);
+}
+
+
+/* ---------- Formater le prix ---------- */
+
+function formatOrderPrice(amount) {
+
+    return Math.round(amount)
+        .toLocaleString('fr-FR') + ' FBu';
+
+}
+
+
+/* ---------- Formater la date ---------- */
+
+function formatOrderDate(date) {
+
+    const orderDate = new Date(date);
+
+    return orderDate.toLocaleDateString(
+        'fr-FR',
+        {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        }
+    );
+}
+
+
+/* ---------- Afficher le statut ---------- */
+
+function getStatusClass(status) {
+
+    if (status === 'Confirmée') {
+        return 'status-confirmed';
+    }
+
+    if (status === 'Annulée') {
+        return 'status-cancelled';
+    }
+
+    if (status === 'Expédiée') {
+        return 'status-shipped';
+    }
+
+    if (status === 'Livrée') {
+        return 'status-delivered';
+    }
+
+    return 'status-pending';
+}
+
+
+/* ---------- Afficher les commandes ---------- */
+
+function renderMyOrders() {
+
+    const container =
+        document.getElementById('my-orders');
+
+    if (!container) return;
+
+
+    const user = getCurrentUser();
+
+
+    /* Vérifier la connexion */
+
+    if (!user) {
+
+        container.innerHTML = `
+            <div class="empty-orders">
+
+                <h3>🔐 Connexion nécessaire</h3>
+
+                <p>
+                    Vous devez être connecté pour voir
+                    vos commandes.
+                </p>
+
+                <a
+                    href="connexion.html"
+                    class="auth-btn"
+                >
+                    Se connecter
+                </a>
+
+            </div>
+        `;
+
+        return;
+    }
+
+
+    /* Récupérer toutes les commandes */
+
+    const data =
+        localStorage.getItem(ORDERS_KEY);
+
+
+    const orders =
+        data ? JSON.parse(data) : [];
+
+
+    /*
+       Filtrer uniquement les commandes
+       appartenant à l'utilisateur connecté.
+    */
+
+    const myOrders =
+        orders.filter(order => {
+
+            return (
+                order.email === user.email ||
+                order.userId === user.id
+            );
+
+        });
+
+
+    /* Aucune commande */
+
+    if (myOrders.length === 0) {
+
+        container.innerHTML = `
+
+            <div class="empty-orders">
+
+                <div class="empty-icon">
+                    🛍️
+                </div>
+
+                <h3>
+                    Vous n'avez pas encore passé
+                    de commande.
+                </h3>
+
+                <p>
+                    Découvrez nos produits et passez
+                    votre première commande.
+                </p>
+
+                <a
+                    href="produits.html"
+                    class="auth-btn"
+                >
+                    Voir les produits
+                </a>
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    /* Trier les commandes : plus récente en premier */
+
+    myOrders.sort(
+        (a, b) =>
+            new Date(b.date) -
+            new Date(a.date)
+    );
+
+
+    /* Afficher les commandes */
+
+    container.innerHTML =
+        myOrders.map(order => `
+
+            <div class="order-card">
+
+                <div class="order-card-header">
+
+                    <div>
+
+                        <h3>
+                            ${order.id}
+                        </h3>
+
+                        <p>
+                            ${formatOrderDate(order.date)}
+                        </p>
+
+                    </div>
+
+                    <span
+                        class="order-status ${getStatusClass(order.status)}"
+                    >
+                        ${order.status || 'En attente'}
+                    </span>
+
+                </div>
+
+
+                <div class="order-products">
+
+                    ${
+                        (order.cart || [])
+                        .map(item => `
+
+                            <div class="order-product">
+
+                                <img
+                                    src="${item.image}"
+                                    alt="${item.name}"
+                                >
+
+                                <div>
+
+                                    <strong>
+                                        ${item.name}
+                                    </strong>
+
+                                    <p>
+                                        Quantité :
+                                        ${item.quantity}
+                                    </p>
+
+                                </div>
+
+                                <span>
+                                    ${formatOrderPrice(
+                                        item.price *
+                                        item.quantity
+                                    )}
+                                </span>
+
+                            </div>
+
+                        `)
+                        .join('')
+                    }
+
+                </div>
+
+
+                <div class="order-card-footer">
+
+                    <strong>
+                        Total :
+                        ${formatOrderPrice(order.total)}
+                    </strong>
+
+                    <button
+                        type="button"
+                        onclick="showOrderDetails('${order.id}')"
+                    >
+                        Voir les détails
+                    </button>
+
+                </div>
+
+            </div>
+
+        `)
+        .join('');
+
+}
+
+
+/* =====================================================
+   DÉTAILS D'UNE COMMANDE
+   ===================================================== */
+
+function showOrderDetails(orderId) {
+
+    const data =
+        localStorage.getItem(ORDERS_KEY);
+
+    if (!data) return;
+
+
+    const orders =
+        JSON.parse(data);
+
+
+    const order =
+        orders.find(
+            item => item.id === orderId
+        );
+
+
+    if (!order) return;
+
+
+    const user =
+        getCurrentUser();
+
+
+    if (!user) return;
+
+
+    /*
+       Sécurité :
+       vérifier que la commande appartient
+       bien à l'utilisateur connecté.
+    */
+
+    if (
+        order.email !== user.email &&
+        order.userId !== user.id
+    ) {
+
+        alert(
+            'Cette commande ne vous appartient pas.'
+        );
+
+        return;
+    }
+
+
+    const details =
+        document.getElementById('order-details');
+
+
+    details.innerHTML = `
+
+        <div class="details-section">
+
+            <h3>Commande</h3>
+
+            <p>
+                <strong>Numéro :</strong>
+                ${order.id}
+            </p>
+
+            <p>
+                <strong>Date :</strong>
+                ${formatOrderDate(order.date)}
+            </p>
+
+            <p>
+                <strong>Statut :</strong>
+                ${order.status || 'En attente'}
+            </p>
+
+        </div>
+
+
+        <div class="details-section">
+
+            <h3>Produits</h3>
+
+            ${
+                (order.cart || [])
+                .map(item => `
+
+                    <div class="detail-product">
+
+                        <span>
+                            ${item.name}
+                            × ${item.quantity}
+                        </span>
+
+                        <strong>
+                            ${formatOrderPrice(
+                                item.price *
+                                item.quantity
+                            )}
+                        </strong>
+
+                    </div>
+
+                `)
+                .join('')
+            }
+
+        </div>
+
+
+        <div class="details-section">
+
+            <h3>Paiement</h3>
+
+            <p>
+                <strong>Mode :</strong>
+                ${order.payment || 'Non indiqué'}
+            </p>
+
+            ${
+                order.transactionRef
+                ? `
+                    <p>
+                        <strong>
+                            Référence :
+                        </strong>
+
+                        ${order.transactionRef}
+                    </p>
+                `
+                : ''
+            }
+
+        </div>
+
+
+        <div class="details-total">
+
+            Total :
+            ${formatOrderPrice(order.total)}
+
+        </div>
+
+    `;
+
+
+    document
+        .getElementById('order-modal')
+        .classList.add('show');
+}
+
+
+/* =====================================================
+   FERMER LA FENÊTRE
+   ===================================================== */
+
+function closeOrderModal() {
+
+    document
+        .getElementById('order-modal')
+        .classList.remove('show');
+
+}
+
+
+/* Fermer en cliquant à l'extérieur */
+
+document.addEventListener(
+    'click',
+    function(event) {
+
+        const modal =
+            document.getElementById('order-modal');
+
+        if (
+            event.target === modal
+        ) {
+
+            closeOrderModal();
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   INITIALISATION
+   ===================================================== */
+
+document.addEventListener(
+    'DOMContentLoaded',
+    function() {
+
+        renderMyOrders();
+
+    }
+);
+
+</script>
+
+</body>
+</html>
