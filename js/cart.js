@@ -280,7 +280,7 @@ const ORDERS_KEY = 'berlly_orders';
 const orders = JSON.parse(
     localStorage.getItem(ORDERS_KEY) || '[]'
 );
-/*
+
 const newOrder = {
     id: 'CMD-' + Date.now(),
 
@@ -300,7 +300,7 @@ const newOrder = {
 
     status: 'En attente'
 };
-*/
+
 const currentUser =
     JSON.parse(
         localStorage.getItem('berlly_current_user')
