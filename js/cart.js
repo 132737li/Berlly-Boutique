@@ -212,6 +212,19 @@ function togglePaymentDetails() {
 /* Valide et envoie la commande via WhatsApp */
 function handleOrderSubmit(event) {
     event.preventDefault();
+    const currentUser = JSON.parse(
+    localStorage.getItem('berlly_current_user')
+);
+
+if (!currentUser) {
+    alert(
+        'Vous devez créer un compte ou vous connecter avant de passer une commande.'
+    );
+
+    window.location.href = 'connexion.html';
+
+    return false;
+}
 
     const cart = getCart();
     if (cart.length === 0) {
