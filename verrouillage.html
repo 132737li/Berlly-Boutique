@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site en construction - Berlly Boutique</title>
+    <script src="js/gate.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .lock-card {
+            background: #2a2a2a;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 350px;
+            width: 90%;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        p {
+            color: #aaa;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            background: #e63946;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #error {
+            color: #ff6b6b;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="lock-card">
+        <h1>🔒 Berlly Boutique</h1>
+        <p>Ce site est actuellement en développement.</p>
+
+        <form id="unlock-form">
+            <input type="password" id="site-password" placeholder="Mot de passe d'accès" required>
+            <button type="submit">Accéder au site</button>
+        </form>
+
+        <p id="error"></p>
+    </div>
+
+    <script>
+        const SITE_PASSWORD = "berlly2026"; // Change ce mot de passe
+
+        document.getElementById('unlock-form').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const entered = document.getElementById('site-password').value;
+            const error = document.getElementById('error');
+
+            if (entered === SITE_PASSWORD) {
+
+                sessionStorage.setItem('berlly_site_unlocked', 'true');
+
+                const redirectTo = sessionStorage.getItem('berlly_redirect_after_unlock') || 'index.html';
+                window.location.href = redirectTo;
+
+            } else {
+
+                error.textContent = 'Mot de passe incorrect.';
+
+            }
+        });
+    </script>
+
+</body>
+
+</html>
