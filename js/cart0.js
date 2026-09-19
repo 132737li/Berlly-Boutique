@@ -166,6 +166,7 @@ function renderCartPage() {
 
                 </div>
 
+
                 <div class="cart-item-qty">
 
                     <button
@@ -192,11 +193,13 @@ function renderCartPage() {
 
                 </div>
 
+
                 <p class="cart-item-subtotal">
                     ${formatFBu(
                         item.price * item.quantity
                     )}
                 </p>
+
 
                 <button
                     type="button"
@@ -354,6 +357,7 @@ function togglePaymentDetails() {
 
     if (!select) return;
 
+
     document
         .querySelectorAll('.payment-details')
         .forEach(el => {
@@ -367,10 +371,12 @@ function togglePaymentDetails() {
 
         });
 
+
     const target =
         document.getElementById(
             'details-' + select.value
         );
+
 
     if (target) {
 
@@ -395,18 +401,29 @@ function handleOrderSubmit(event) {
     event.preventDefault();
 
 
-    /* -------------------------------------------------
-       L'utilisateur peut commander AVEC ou SANS compte
-       ------------------------------------------------- */
+    /* Vérifier si l'utilisateur est connecté */
 
     const currentUser = JSON.parse(
         localStorage.getItem(
             'berlly_current_user'
-        ) || 'null'
+        )
     );
 
 
-    /* ---------- Vérifier le panier ---------- */
+    if (!currentUser) {
+
+        alert(
+            'Vous devez créer un compte ou vous connecter avant de passer une commande.'
+        );
+
+        window.location.href =
+            'connexion.html';
+
+        return false;
+    }
+
+
+    /* Vérifier le panier */
 
     const cart = getCart();
 
@@ -421,34 +438,27 @@ function handleOrderSubmit(event) {
     }
 
 
-    /* ---------- Informations du client ---------- */
-
-    const nameInput =
-        document.getElementById('order-name');
-
-    const phoneInput =
-        document.getElementById('order-phone');
-
-    const addressInput =
-        document.getElementById('order-address');
-
+    /* Récupérer les informations du client */
 
     const name =
-        nameInput
-            ? nameInput.value.trim()
-            : '';
+        document
+            .getElementById('order-name')
+            .value
+            .trim();
 
 
     const phone =
-        phoneInput
-            ? phoneInput.value.trim()
-            : '';
+        document
+            .getElementById('order-phone')
+            .value
+            .trim();
 
 
     const address =
-        addressInput
-            ? addressInput.value.trim()
-            : '';
+        document
+            .getElementById('order-address')
+            .value
+            .trim();
 
 
     if (!name || !phone || !address) {
@@ -461,22 +471,12 @@ function handleOrderSubmit(event) {
     }
 
 
-    /* ---------- Mode de paiement ---------- */
+    /* Mode de paiement */
 
     const paymentSelect =
         document.getElementById(
             'payment-method'
         );
-
-
-    if (!paymentSelect) {
-
-        alert(
-            'Veuillez sélectionner un mode de paiement.'
-        );
-
-        return false;
-    }
 
 
     const paymentValue =
@@ -491,7 +491,7 @@ function handleOrderSubmit(event) {
             .text;
 
 
-    /* ---------- Référence de transaction ---------- */
+    /* Référence de transaction */
 
     let transactionRef = '';
 
@@ -526,7 +526,7 @@ function handleOrderSubmit(event) {
     }
 
 
-    /* ---------- Total ---------- */
+    /* Total */
 
     const total =
         getCartTotal();
@@ -581,21 +581,6 @@ function handleOrderSubmit(event) {
     }
 
 
-    /* ---------- Statut du compte ---------- */
-
-    if (currentUser) {
-
-        message +=
-            `\n👤 Client connecté : ${currentUser.email}\n`;
-
-    } else {
-
-        message +=
-            '\n👤 Client : Commande sans compte\n';
-
-    }
-
-
     /* ---------- Enregistrement de la commande ---------- */
 
     const ORDERS_KEY =
@@ -610,7 +595,7 @@ function handleOrderSubmit(event) {
         );
 
 
-    /* ---------- Nouvelle commande ---------- */
+    /* Nouvelle commande */
 
     const newOrder = {
 
@@ -656,12 +641,12 @@ function handleOrderSubmit(event) {
     };
 
 
-    /* ---------- Ajouter à l'historique ---------- */
+    /* Ajouter à l'historique */
 
     orders.push(newOrder);
 
 
-    /* ---------- Sauvegarder toutes les commandes ---------- */
+    /* Sauvegarder toutes les commandes */
 
     localStorage.setItem(
         ORDERS_KEY,
@@ -669,7 +654,7 @@ function handleOrderSubmit(event) {
     );
 
 
-    /* ---------- Sauvegarder la dernière commande ---------- */
+    /* Sauvegarder la dernière commande */
 
     localStorage.setItem(
         'berlly_last_order',
@@ -677,12 +662,12 @@ function handleOrderSubmit(event) {
     );
 
 
-    /* ---------- Vider le panier ---------- */
+    /* Vider le panier */
 
     clearCart();
 
 
-    /* ---------- Ouvrir WhatsApp ---------- */
+    /* Ouvrir WhatsApp */
 
     const encoded =
         encodeURIComponent(message);
