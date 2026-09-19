@@ -168,12 +168,11 @@ function checkPasswordStrength(input) {
     }
 }
 
-
 /* =====================================================
-   INSCRIPTION
+   INSCRIPTION (connectée au backend)
    ===================================================== */
 
-function handleRegister(event) {
+async function handleRegister(event) {
 
     event.preventDefault();
 
@@ -219,70 +218,80 @@ function handleRegister(event) {
         return;
     }
 
+    message.textContent = 'Création du compte en cours...';
 
-    const users = getUsers();
+    try {
 
-    const existingUser =
-        users.find(user => user.email === email);
+        const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                nom: name,
+                email: email,
+                motDePasse: password,
+                role: 'utilisateur'
+            })
+        });
 
+        const data = await response.json();
 
-    if (existingUser) {
+        if (!response.ok) {
+
+            message.textContent =
+                data.message || 'Erreur lors de la création du compte.';
+
+            return;
+        }
 
         message.textContent =
-            'Un compte existe déjà avec cette adresse e-mail.';
+            'Compte créé avec succès ! Connexion...';
 
-        return;
+        // Connexion automatique juste après l'inscription
+        const loginResponse = await fetch(`${API_BASE_URL}/api/auth/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: email,
+                motDePasse: password
+            })
+        });
+
+        const loginData = await loginResponse.json();
+
+        if (loginResponse.ok) {
+
+            localStorage.setItem('berlly_token', loginData.token);
+            localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(loginData.utilisateur));
+
+        }
+
+        setTimeout(() => {
+
+            window.location.href = 'profil.html';
+
+        }, 1000);
+
+    } catch (err) {
+
+        message.textContent =
+            'Impossible de contacter le serveur. Vérifie que le backend est démarré.';
+
+        console.error(err);
     }
-
-
-    const newUser = {
-
-        id: 'USER-' + Date.now(),
-
-        name: name,
-
-        email: email,
-
-        phone: phone,
-
-        password: password,
-
-        createdAt: new Date().toISOString()
-
-    };
-
-
-    users.push(newUser);
-
-    saveUsers(users);
-
-
-    localStorage.setItem(
-        CURRENT_USER_KEY,
-        JSON.stringify(newUser)
-    );
-
-
-    message.textContent =
-        'Compte créé avec succès !';
-
-
-    setTimeout(() => {
-
-        window.location.href = 'profil.html';
-
-    }, 1000);
 }
-
-
 /* =====================================================
-   CONNEXION
+   CONNEXION (connectée au backend)
    ===================================================== */
 
-function handleLogin(event) {
+const API_BASE_URL = 'http://localhost:5000';
+
+async function handleLogin(event) {
 
     event.preventDefault();
-
 
     const email =
         document.getElementById('login-email')
@@ -296,42 +305,54 @@ function handleLogin(event) {
     const message =
         document.getElementById('login-message');
 
+    message.textContent = 'Connexion en cours...';
 
-    const users = getUsers();
+    try {
 
+        const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: email,
+                motDePasse: password
+            })
+        });
 
-    const user =
-        users.find(
-            user =>
-                user.email === email &&
-                user.password === password
-        );
+        const data = await response.json();
 
+        if (!response.ok) {
 
-    if (!user) {
+            message.textContent =
+                data.message || 'Adresse e-mail ou mot de passe incorrect.';
+
+            return;
+        }
+
+        // On stocke le token et les infos utilisateur
+        localStorage.setItem('berlly_token', data.token);
+        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(data.utilisateur));
+
+        message.textContent = 'Connexion réussie !';
+
+        setTimeout(() => {
+
+            if (data.utilisateur.role === 'admin') {
+                window.location.href = 'admin/dashboard.html';
+            } else {
+                window.location.href = 'profil.html';
+            }
+
+        }, 700);
+
+    } catch (err) {
 
         message.textContent =
-            'Adresse e-mail ou mot de passe incorrect.';
+            'Impossible de contacter le serveur. Vérifie que le backend est démarré.';
 
-        return;
+        console.error(err);
     }
-
-
-    localStorage.setItem(
-        CURRENT_USER_KEY,
-        JSON.stringify(user)
-    );
-
-
-    message.textContent =
-        'Connexion réussie !';
-
-
-    setTimeout(() => {
-
-        window.location.href = 'profil.html';
-
-    }, 700);
 }
 
 

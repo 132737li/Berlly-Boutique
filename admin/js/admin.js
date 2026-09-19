@@ -3,32 +3,60 @@
    ADMINISTRATION
 ========================================= */
 
-const ORDERS_KEY = "berlly_orders";
+const API_BASE_URL = "http://localhost:5000";
+
+let ordersCache = [];
 
 
 /* =========================================
-   RÉCUPÉRER LES COMMANDES
+   EN-TÊTES AVEC TOKEN
 ========================================= */
 
-function getOrders() {
+function getAuthHeaders() {
 
-    const data = localStorage.getItem(ORDERS_KEY);
+    const token = localStorage.getItem("berlly_token");
 
-    return data ? JSON.parse(data) : [];
+    return {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+    };
 
 }
 
 
 /* =========================================
-   SAUVEGARDER LES COMMANDES
+   RÉCUPÉRER LES COMMANDES DEPUIS LE BACKEND
 ========================================= */
 
-function saveOrders(orders) {
+async function fetchOrders() {
 
-    localStorage.setItem(
-        ORDERS_KEY,
-        JSON.stringify(orders)
-    );
+    try {
+
+        const response = await fetch(`${API_BASE_URL}/api/orders`, {
+            headers: getAuthHeaders()
+        });
+
+        if (!response.ok) {
+
+            if (response.status === 401 || response.status === 403) {
+                window.location.href = "index.html";
+                return [];
+            }
+
+            throw new Error("Erreur lors du chargement des commandes.");
+
+        }
+
+        ordersCache = await response.json();
+
+        return ordersCache;
+
+    } catch (err) {
+
+        console.error(err);
+        return [];
+
+    }
 
 }
 
@@ -71,20 +99,25 @@ function checkAdminAccess() {
         return;
     }
 
-    const logged =
-        sessionStorage.getItem("berlly_admin_logged");
+    const token = localStorage.getItem("berlly_token");
+    const adminData = localStorage.getItem("berlly_admin");
 
-    if (logged !== "true") {
-
+    if (!token || !adminData) {
         window.location.href = "index.html";
+        return;
+    }
 
+    const admin = JSON.parse(adminData);
+
+    if (admin.role !== "admin") {
+        window.location.href = "index.html";
     }
 
 }
 
 
 /* =========================================
-   CONNEXION
+   CONNEXION ADMIN
 ========================================= */
 
 function setupLogin() {
@@ -95,49 +128,63 @@ function setupLogin() {
     if (!form) return;
 
 
-    form.addEventListener("submit", function(event) {
+    form.addEventListener("submit", async function(event) {
 
         event.preventDefault();
 
-
-        const username =
+        const email =
             document.getElementById("admin-username")
                 .value
-                .trim();
-
+                .trim()
+                .toLowerCase();
 
         const password =
             document.getElementById("admin-password")
                 .value;
 
+        const errorMsg =
+            document.getElementById("login-error");
 
-        /*
-            IDENTIFIANTS ADMIN
-        */
+        errorMsg.textContent = "Connexion en cours...";
 
-        if (
-            username === "Easter" &&
-            password === "LoveU540M$"
-        ) {
+        try {
 
-            sessionStorage.setItem(
-                "berlly_admin_logged",
-                "true"
-            );
+            const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: email,
+                    motDePasse: password
+                })
+            });
 
+            const data = await response.json();
 
-            window.location.href =
-                "dashboard.html";
+            if (!response.ok) {
+                errorMsg.textContent =
+                    data.message || "Nom d'utilisateur ou mot de passe incorrect.";
+                return;
+            }
 
-        }
+            if (data.utilisateur.role !== "admin") {
+                errorMsg.textContent =
+                    "Ce compte n'a pas les droits administrateur.";
+                return;
+            }
 
-        else {
+            localStorage.setItem("berlly_token", data.token);
+            localStorage.setItem("berlly_admin", JSON.stringify(data.utilisateur));
 
-            document.getElementById(
-                "login-error"
-            ).textContent =
-                "Nom d'utilisateur ou mot de passe incorrect.";
+            window.location.href = "dashboard.html";
 
+        } catch (err) {
+
+            errorMsg.textContent =
+                "Impossible de contacter le serveur. Vérifie que le backend est démarré.";
+
+            console.error(err);
         }
 
     });
@@ -159,9 +206,8 @@ function setupLogout() {
 
     button.addEventListener("click", function() {
 
-        sessionStorage.removeItem(
-            "berlly_admin_logged"
-        );
+        localStorage.removeItem("berlly_token");
+        localStorage.removeItem("berlly_admin");
 
         window.location.href = "index.html";
 
@@ -174,7 +220,7 @@ function setupLogout() {
    DASHBOARD
 ========================================= */
 
-function loadDashboard() {
+async function loadDashboard() {
 
     const totalElement =
         document.getElementById("total-orders");
@@ -182,7 +228,7 @@ function loadDashboard() {
     if (!totalElement) return;
 
 
-    const orders = getOrders();
+    const orders = await fetchOrders();
 
 
     const pending =
@@ -246,8 +292,8 @@ function loadRecentOrders(orders) {
         [...orders]
         .sort(
             (a, b) =>
-                new Date(b.date) -
-                new Date(a.date)
+                new Date(b.createdAt) -
+                new Date(a.createdAt)
         )
         .slice(0, 5);
 
@@ -280,7 +326,7 @@ function loadRecentOrders(orders) {
             <tr>
 
                 <td>
-                    ${escapeHTML(order.id)}
+                    ${escapeHTML(order._id)}
                 </td>
 
                 <td>
@@ -296,7 +342,7 @@ function loadRecentOrders(orders) {
                 </td>
 
                 <td>
-                    ${formatDate(order.date)}
+                    ${formatDate(order.createdAt)}
                 </td>
 
                 <td>
@@ -314,13 +360,15 @@ function loadRecentOrders(orders) {
    HISTORIQUE
 ========================================= */
 
-function loadOrdersTable() {
+async function loadOrdersTable() {
 
     const table =
         document.getElementById("orders-table");
 
     if (!table) return;
 
+
+    await fetchOrders();
 
     displayOrders();
 
@@ -366,7 +414,7 @@ function displayOrders() {
     if (!table) return;
 
 
-    let orders = getOrders();
+    let orders = [...ordersCache];
 
 
     const search =
@@ -389,7 +437,7 @@ function displayOrders() {
 
             return (
 
-                String(order.id)
+                String(order._id)
                     .toLowerCase()
                     .includes(search)
 
@@ -431,8 +479,8 @@ function displayOrders() {
 
     orders.sort(
         (a, b) =>
-            new Date(b.date) -
-            new Date(a.date)
+            new Date(b.createdAt) -
+            new Date(a.createdAt)
     );
 
 
@@ -465,7 +513,7 @@ function displayOrders() {
 
                 <td>
                     <strong>
-                        ${escapeHTML(order.id)}
+                        ${escapeHTML(order._id)}
                     </strong>
                 </td>
 
@@ -498,14 +546,14 @@ function displayOrders() {
 
 
                 <td>
-                    ${formatDate(order.date)}
+                    ${formatDate(order.createdAt)}
                 </td>
 
 
                 <td>
 
                     <select
-                        onchange="changeOrderStatus('${order.id}', this.value)"
+                        onchange="changeOrderStatus('${order._id}', this.value)"
                     >
 
                         <option value="En attente"
@@ -537,7 +585,7 @@ function displayOrders() {
 
                     <button
                         class="action-button view-button"
-                        onclick="viewOrder('${order.id}')"
+                        onclick="viewOrder('${order._id}')"
                         title="Voir les détails"
                     >
 
@@ -548,7 +596,7 @@ function displayOrders() {
 
                     <button
                         class="action-button delete-button"
-                        onclick="deleteOrder('${order.id}')"
+                        onclick="deleteOrder('${order._id}')"
                         title="Supprimer"
                     >
 
@@ -569,27 +617,29 @@ function displayOrders() {
    MODIFIER LE STATUT
 ========================================= */
 
-function changeOrderStatus(id, newStatus) {
+async function changeOrderStatus(id, newStatus) {
 
-    const orders = getOrders();
+    try {
 
+        const response = await fetch(`${API_BASE_URL}/api/orders/${id}`, {
+            method: "PATCH",
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ status: newStatus })
+        });
 
-    const order =
-        orders.find(
-            item => item.id === id
-        );
+        if (!response.ok) {
+            throw new Error("Erreur lors de la mise à jour.");
+        }
 
+        await fetchOrders();
+        displayOrders();
 
-    if (!order) return;
+    } catch (err) {
 
+        console.error(err);
+        alert("Impossible de modifier le statut de la commande.");
 
-    order.status = newStatus;
-
-
-    saveOrders(orders);
-
-
-    displayOrders();
+    }
 
 }
 
@@ -600,12 +650,9 @@ function changeOrderStatus(id, newStatus) {
 
 function viewOrder(id) {
 
-    const orders = getOrders();
-
-
     const order =
-        orders.find(
-            item => item.id === id
+        ordersCache.find(
+            item => item._id === id
         );
 
 
@@ -674,7 +721,7 @@ function viewOrder(id) {
 
         <div class="order-detail-line">
             <strong>Numéro :</strong>
-            ${escapeHTML(order.id)}
+            ${escapeHTML(order._id)}
         </div>
 
         <div class="order-detail-line">
@@ -706,7 +753,7 @@ function viewOrder(id) {
 
         <div class="order-detail-line">
             <strong>Date :</strong>
-            ${formatDate(order.date)}
+            ${formatDate(order.createdAt)}
         </div>
 
         <div class="order-detail-line">
@@ -741,7 +788,7 @@ function viewOrder(id) {
    SUPPRIMER
 ========================================= */
 
-function deleteOrder(id) {
+async function deleteOrder(id) {
 
     const confirmation =
         confirm(
@@ -752,21 +799,27 @@ function deleteOrder(id) {
     if (!confirmation) return;
 
 
-    let orders = getOrders();
+    try {
 
+        const response = await fetch(`${API_BASE_URL}/api/orders/${id}`, {
+            method: "DELETE",
+            headers: getAuthHeaders()
+        });
 
-    orders =
-        orders.filter(
-            order => order.id !== id
-        );
+        if (!response.ok) {
+            throw new Error("Erreur lors de la suppression.");
+        }
 
+        await fetchOrders();
+        displayOrders();
+        loadDashboard();
 
-    saveOrders(orders);
+    } catch (err) {
 
+        console.error(err);
+        alert("Impossible de supprimer la commande.");
 
-    displayOrders();
-
-    loadDashboard();
+    }
 
 }
 
