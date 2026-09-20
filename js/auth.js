@@ -2,6 +2,8 @@
    Berlly Boutique - Authentification
    ===================================================== */
 
+const API_BASE_URL = 'http://localhost:5000';
+
 const USERS_KEY = 'berlly_users';
 const CURRENT_USER_KEY = 'berlly_current_user';
 const RESET_EMAIL_KEY = 'berlly_reset_email';
@@ -283,11 +285,11 @@ async function handleRegister(event) {
         console.error(err);
     }
 }
+
+
 /* =====================================================
    CONNEXION (connectée au backend)
    ===================================================== */
-
-const API_BASE_URL = 'http://localhost:5000';
 
 async function handleLogin(event) {
 
@@ -541,7 +543,7 @@ function loadProfile() {
 
 
     if (name) {
-        name.value = user.name || '';
+        name.value = user.nom || '';
     }
 
     if (email) {

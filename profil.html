@@ -2,16 +2,11 @@
 <html lang="fr">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Nouveau mot de passe - Berlly Boutique</title>
-
+    <title>Mon profil - Berlly Boutique</title>
     <link rel="stylesheet" href="css/auth.css">
     <script src="js/gate.js"></script>
-
 </head>
 
 <body>
@@ -21,81 +16,47 @@
         <div class="auth-card">
 
             <div class="auth-logo">
-
                 <h1>Berlly Boutique</h1>
-
-                <p>Réinitialisation</p>
-
+                <p>Mon profil</p>
             </div>
 
-            <h2>Nouveau mot de passe</h2>
+            <h2>Mes informations</h2>
 
-            <form id="reset-form">
+            <form id="profile-form">
 
                 <div class="form-group">
-
-                    <label for="reset-password">
-                        Nouveau mot de passe
-                    </label>
-
-                    <div class="password-box">
-
-                        <input type="password" id="reset-password" placeholder="Nouveau mot de passe" required>
-
-                        <button type="button" class="show-password" onclick="togglePassword('reset-password', this)">
-                            👁
-                        </button>
-
-                    </div>
-
-                    <div class="password-strength">
-
-                        <div id="reset-strength-bar"></div>
-
-                    </div>
-
-                    <p id="reset-strength-text">
-                        Force du mot de passe
-                    </p>
-
+                    <label for="profile-name">Nom complet</label>
+                    <input type="text" id="profile-name" required>
                 </div>
 
-                <button type="button" class="generate-btn" onclick="generatePassword('reset-password')">
-                    🔐 Générer un mot de passe sécurisé
-                </button>
+                <div class="form-group">
+                    <label for="profile-email">Adresse e-mail</label>
+                    <input type="email" id="profile-email" disabled>
+                </div>
 
                 <div class="form-group">
-
-                    <label for="reset-confirm">
-                        Confirmer le nouveau mot de passe
-                    </label>
-
-                    <div class="password-box">
-
-                        <input type="password" id="reset-confirm" placeholder="Confirmer le mot de passe" required>
-
-                        <button type="button" class="show-password" onclick="togglePassword('reset-confirm', this)">
-                            👁
-                        </button>
-
-                    </div>
-
+                    <label for="profile-phone">Téléphone</label>
+                    <input type="tel" id="profile-phone">
                 </div>
 
                 <button type="submit" class="auth-btn">
-                    Modifier le mot de passe
+                    Enregistrer les modifications
                 </button>
 
             </form>
 
-            <p class="auth-message" id="reset-message"></p>
+            <p class="auth-message" id="profile-message"></p>
 
             <div class="auth-footer">
 
                 <p>
-                    <a href="connexion.html">
-                        ← Retour à la connexion
+                    <a href="#" onclick="logout(); return false;">
+                        Se déconnecter
                     </a>
+                </p>
+
+                <p>
+                    <a href="index.html">← Retour à la boutique</a>
                 </p>
 
             </div>

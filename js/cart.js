@@ -1,119 +1,185 @@
 /* --- Berlly Boutique - Gestion du panier & commande --- */
 
+
 const CART_KEY = 'berlly_cart';
+
 const WHATSAPP_NUMBER = '25776672387'; // numéro WhatsApp de la boutique
+
+const API_BASE_URL = 'http://localhost:5000';
+
 
 
 /* ---------- Utilitaires panier ---------- */
 
+
 function getCart() {
+
     const data = localStorage.getItem(CART_KEY);
+
     return data ? JSON.parse(data) : [];
+
 }
+
 
 function saveCart(cart) {
+
     localStorage.setItem(CART_KEY, JSON.stringify(cart));
+
     updateCartBadge();
+
 }
 
+
 function addToCart(id, name, price, image, quantity = 1) {
+
     quantity = parseInt(quantity) || 1;
+
 
     const cart = getCart();
     const existing = cart.find(item => item.id === id);
 
+
     if (existing) {
+
         existing.quantity += quantity;
+
     } else {
+
         cart.push({
+
             id,
             name,
             price: Number(price),
             image,
             quantity
+
         });
+
     }
+
 
     saveCart(cart);
     showToast(`${name} ajouté au panier ✔`);
+
 }
 
+
 function removeFromCart(id) {
+
     let cart = getCart();
 
     cart = cart.filter(item => item.id !== id);
 
     saveCart(cart);
     renderCartPage();
+
 }
 
+
 function updateQuantity(id, quantity) {
+
     quantity = parseInt(quantity);
 
     let cart = getCart();
 
+
     if (quantity < 1) {
+
         cart = cart.filter(item => item.id !== id);
+
     } else {
+
         const item = cart.find(item => item.id === id);
 
         if (item) {
             item.quantity = quantity;
         }
+
     }
+
 
     saveCart(cart);
     renderCartPage();
+
 }
+
 
 function clearCart() {
+
     localStorage.removeItem(CART_KEY);
     updateCartBadge();
+
 }
+
 
 function getCartTotal() {
+
     return getCart().reduce(
+
         (sum, item) => sum + item.price * item.quantity,
         0
+
     );
+
 }
+
 
 function getCartCount() {
+
     return getCart().reduce(
+
         (sum, item) => sum + item.quantity,
         0
+
     );
+
 }
 
+
 function formatFBu(amount) {
+
     return Math.round(amount).toLocaleString('fr-FR') + ' FBu';
+
 }
+
 
 
 /* ---------- Badge du panier ---------- */
 
+
 function updateCartBadge() {
+
     document.querySelectorAll('.cart-count').forEach(badge => {
+
         const count = getCartCount();
 
         badge.textContent = count;
 
         badge.style.display =
             count > 0 ? 'inline-flex' : 'none';
+
     });
+
 }
+
 
 
 /* ---------- Notification ---------- */
 
+
 function showToast(message) {
+
     let toast = document.getElementById('cart-toast');
 
+
     if (!toast) {
+
         toast = document.createElement('div');
         toast.id = 'cart-toast';
         document.body.appendChild(toast);
+
     }
+
 
     toast.textContent = message;
     toast.classList.add('show');
@@ -121,40 +187,57 @@ function showToast(message) {
     clearTimeout(toast._timeout);
 
     toast._timeout = setTimeout(() => {
+
         toast.classList.remove('show');
+
     }, 2200);
+
 }
+
 
 
 /* ---------- Page Panier ---------- */
 
+
 function renderCartPage() {
+
     const container = document.getElementById('cart-items');
     const totalEl = document.getElementById('cart-total-value');
 
+
     if (!container) return;
+
 
     const cart = getCart();
 
+
     if (cart.length === 0) {
 
+
         container.innerHTML = `
+
             <p class="empty-cart">
                 Votre panier est vide.
                 <a href="produits.html">Voir nos produits</a>
             </p>
+
         `;
+
 
     } else {
 
+
         container.innerHTML = cart.map(item => `
 
+
             <div class="cart-item">
+
 
                 <img
                     src="${item.image}"
                     alt="${item.name}"
                 >
+
 
                 <div class="cart-item-info">
 
@@ -165,6 +248,7 @@ function renderCartPage() {
                     </p>
 
                 </div>
+
 
                 <div class="cart-item-qty">
 
@@ -192,11 +276,13 @@ function renderCartPage() {
 
                 </div>
 
+
                 <p class="cart-item-subtotal">
                     ${formatFBu(
                         item.price * item.quantity
                     )}
                 </p>
+
 
                 <button
                     type="button"
@@ -207,19 +293,28 @@ function renderCartPage() {
                     <i class="fa-solid fa-trash"></i>
                 </button>
 
+
             </div>
 
+
         `).join('');
+
     }
 
+
     if (totalEl) {
+
         totalEl.textContent =
             formatFBu(getCartTotal());
+
     }
+
 }
 
 
+
 /* ---------- Page Produit ---------- */
+
 
 function changeProductQty(delta) {
 
@@ -227,6 +322,7 @@ function changeProductQty(delta) {
         document.getElementById('product-qty');
 
     if (!input) return;
+
 
     const min =
         parseInt(input.min) || 1;
@@ -238,10 +334,13 @@ function changeProductQty(delta) {
         value = min;
     }
 
+
     input.value = value;
 
     updateProductSubtotal();
+
 }
+
 
 
 function updateProductSubtotal() {
@@ -254,6 +353,7 @@ function updateProductSubtotal() {
 
     if (!input || !subtotalEl) return;
 
+
     const price =
         Number(subtotalEl.dataset.price || 0);
 
@@ -262,14 +362,18 @@ function updateProductSubtotal() {
 
     subtotalEl.textContent =
         formatFBu(price * qty);
+
 }
 
 
+
 function addProductToCart(
+
     id,
     name,
     price,
     image
+
 ) {
 
     const input =
@@ -281,16 +385,21 @@ function addProductToCart(
             : 1;
 
     addToCart(
+
         id,
         name,
         price,
         image,
         qty
+
     );
+
 }
 
 
+
 /* ---------- Page Commande ---------- */
+
 
 function renderOrderSummary() {
 
@@ -302,22 +411,30 @@ function renderOrderSummary() {
 
     if (!container) return;
 
+
     const cart = getCart();
+
 
     if (cart.length === 0) {
 
+
         container.innerHTML = `
+
             <p>
                 Votre panier est vide.
                 <a href="produits.html">
                     Voir les produits
                 </a>
             </p>
+
         `;
+
 
     } else {
 
+
         container.innerHTML = cart.map(item => `
+
 
             <div class="order-item">
 
@@ -335,17 +452,25 @@ function renderOrderSummary() {
 
             </div>
 
+
         `).join('');
+
     }
 
+
     if (totalEl) {
+
         totalEl.textContent =
             formatFBu(getCartTotal());
+
     }
+
 }
 
 
+
 /* ---------- Paiement ---------- */
+
 
 function togglePaymentDetails() {
 
@@ -353,6 +478,7 @@ function togglePaymentDetails() {
         document.getElementById('payment-method');
 
     if (!select) return;
+
 
     document
         .querySelectorAll('.payment-details')
@@ -367,10 +493,12 @@ function togglePaymentDetails() {
 
         });
 
+
     const target =
         document.getElementById(
             'details-' + select.value
         );
+
 
     if (target) {
 
@@ -385,28 +513,38 @@ function togglePaymentDetails() {
             });
 
     }
+
 }
+
 
 
 /* ---------- Validation et envoi de la commande ---------- */
 
-function handleOrderSubmit(event) {
+
+async function handleOrderSubmit(event) {
+
 
     event.preventDefault();
+
 
 
     /* -------------------------------------------------
        L'utilisateur peut commander AVEC ou SANS compte
        ------------------------------------------------- */
 
+
     const currentUser = JSON.parse(
+
         localStorage.getItem(
             'berlly_current_user'
         ) || 'null'
+
     );
 
 
+
     /* ---------- Vérifier le panier ---------- */
+
 
     const cart = getCart();
 
@@ -421,7 +559,9 @@ function handleOrderSubmit(event) {
     }
 
 
+
     /* ---------- Informations du client ---------- */
+
 
     const nameInput =
         document.getElementById('order-name');
@@ -434,21 +574,13 @@ function handleOrderSubmit(event) {
 
 
     const name =
-        nameInput
-            ? nameInput.value.trim()
-            : '';
-
+        nameInput ? nameInput.value.trim() : '';
 
     const phone =
-        phoneInput
-            ? phoneInput.value.trim()
-            : '';
-
+        phoneInput ? phoneInput.value.trim() : '';
 
     const address =
-        addressInput
-            ? addressInput.value.trim()
-            : '';
+        addressInput ? addressInput.value.trim() : '';
 
 
     if (!name || !phone || !address) {
@@ -461,12 +593,12 @@ function handleOrderSubmit(event) {
     }
 
 
+
     /* ---------- Mode de paiement ---------- */
 
+
     const paymentSelect =
-        document.getElementById(
-            'payment-method'
-        );
+        document.getElementById('payment-method');
 
 
     if (!paymentSelect) {
@@ -479,19 +611,15 @@ function handleOrderSubmit(event) {
     }
 
 
-    const paymentValue =
-        paymentSelect.value;
-
+    const paymentValue = paymentSelect.value;
 
     const paymentLabel =
-        paymentSelect
-            .options[
-                paymentSelect.selectedIndex
-            ]
-            .text;
+        paymentSelect.options[paymentSelect.selectedIndex].text;
+
 
 
     /* ---------- Référence de transaction ---------- */
+
 
     let transactionRef = '';
 
@@ -502,16 +630,10 @@ function handleOrderSubmit(event) {
     ) {
 
         const refInput =
-            document.getElementById(
-                'ref-' + paymentValue
-            );
-
+            document.getElementById('ref-' + paymentValue);
 
         transactionRef =
-            refInput
-                ? refInput.value.trim()
-                : '';
-
+            refInput ? refInput.value.trim() : '';
 
         if (!transactionRef) {
 
@@ -526,199 +648,149 @@ function handleOrderSubmit(event) {
     }
 
 
+
     /* ---------- Total ---------- */
 
-    const total =
-        getCartTotal();
+
+    const total = getCartTotal();
+
+
+
+    /* ---------- Enregistrement de la commande sur le serveur ---------- */
+
+
+    const submitButton =
+        event.target.querySelector('button[type="submit"]');
+
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = 'Envoi de la commande...';
+    }
+
+
+    try {
+
+        const response = await fetch(`${API_BASE_URL}/api/orders`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: name,
+                phone: phone,
+                address: address,
+                payment: paymentLabel,
+                transactionRef: transactionRef,
+                cart: cart,
+                total: total
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Erreur lors de l\'enregistrement de la commande.');
+        }
+
+        const savedOrder = await response.json();
+
+        localStorage.setItem(
+            'berlly_last_order',
+            JSON.stringify(savedOrder)
+        );
+
+    } catch (err) {
+
+        console.error(err);
+
+        alert(
+            'Impossible d\'enregistrer votre commande. Vérifiez votre connexion et réessayez.'
+        );
+
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Confirmer la commande';
+        }
+
+        return false;
+    }
+
 
 
     /* ---------- Message WhatsApp ---------- */
 
+
     let message =
         '🛍️ *Nouvelle commande - Berlly Boutique*\n\n';
 
+    message += `👤 Nom : ${name}\n`;
+    message += `📞 Téléphone : ${phone}\n`;
+    message += `🏠 Adresse : ${address}\n\n`;
 
-    message +=
-        `👤 Nom : ${name}\n`;
-
-
-    message +=
-        `📞 Téléphone : ${phone}\n`;
-
-
-    message +=
-        `🏠 Adresse : ${address}\n\n`;
-
-
-    message +=
-        '📦 *Produits commandés :*\n';
-
+    message += '📦 *Produits commandés :*\n';
 
     cart.forEach(item => {
 
         message +=
             `- ${item.name} x${item.quantity} = ` +
-            `${formatFBu(
-                item.price * item.quantity
-            )}\n`;
+            `${formatFBu(item.price * item.quantity)}\n`;
 
     });
 
-
-    message +=
-        `\n💰 *Total : ${formatFBu(total)}*\n`;
-
-
-    message +=
-        `💳 Paiement : ${paymentLabel}\n`;
-
+    message += `\n💰 *Total : ${formatFBu(total)}*\n`;
+    message += `💳 Paiement : ${paymentLabel}\n`;
 
     if (transactionRef) {
-
-        message +=
-            `🔖 Référence de transaction : ${transactionRef}\n`;
-
+        message += `🔖 Référence de transaction : ${transactionRef}\n`;
     }
-
-
-    /* ---------- Statut du compte ---------- */
 
     if (currentUser) {
-
-        message +=
-            `\n👤 Client connecté : ${currentUser.email}\n`;
-
+        message += `\n👤 Client connecté : ${currentUser.email}\n`;
     } else {
-
-        message +=
-            '\n👤 Client : Commande sans compte\n';
-
+        message += '\n👤 Client : Commande sans compte\n';
     }
 
-
-    /* ---------- Enregistrement de la commande ---------- */
-
-    const ORDERS_KEY =
-        'berlly_orders';
-
-
-    const orders =
-        JSON.parse(
-            localStorage.getItem(
-                ORDERS_KEY
-            ) || '[]'
-        );
-
-
-    /* ---------- Nouvelle commande ---------- */
-
-    const newOrder = {
-
-        id:
-            'CMD-' + Date.now(),
-
-        userId:
-            currentUser
-                ? currentUser.id
-                : null,
-
-        email:
-            currentUser
-                ? currentUser.email
-                : null,
-
-        name:
-            name,
-
-        phone:
-            phone,
-
-        address:
-            address,
-
-        cart:
-            cart,
-
-        total:
-            total,
-
-        payment:
-            paymentLabel,
-
-        transactionRef:
-            transactionRef,
-
-        date:
-            new Date().toISOString(),
-
-        status:
-            'En attente'
-    };
-
-
-    /* ---------- Ajouter à l'historique ---------- */
-
-    orders.push(newOrder);
-
-
-    /* ---------- Sauvegarder toutes les commandes ---------- */
-
-    localStorage.setItem(
-        ORDERS_KEY,
-        JSON.stringify(orders)
-    );
-
-
-    /* ---------- Sauvegarder la dernière commande ---------- */
-
-    localStorage.setItem(
-        'berlly_last_order',
-        JSON.stringify(newOrder)
-    );
 
 
     /* ---------- Vider le panier ---------- */
 
+
     clearCart();
+
 
 
     /* ---------- Ouvrir WhatsApp ---------- */
 
-    const encoded =
-        encodeURIComponent(message);
 
+    const encoded = encodeURIComponent(message);
 
     window.location.href =
         `https://wa.me/${WHATSAPP_NUMBER}?text=${encoded}`;
 
 
     return false;
+
 }
 
 
+
 /* ---------- Recherche de produits ---------- */
+
 
 function filterProducts(query) {
 
     const term =
         query.trim().toLowerCase();
 
-
     document
         .querySelectorAll('.product-card')
         .forEach(card => {
 
             const title =
-                card.querySelector(
-                    'h2, h3'
-                );
-
+                card.querySelector('h2, h3');
 
             const name =
                 title
                     ? title.textContent.toLowerCase()
                     : '';
-
 
             card.style.display =
                 name.includes(term)
@@ -726,24 +798,25 @@ function filterProducts(query) {
                     : 'none';
 
         });
+
 }
+
 
 
 /* ---------- Initialisation ---------- */
 
+
 document.addEventListener(
+
     'DOMContentLoaded',
     () => {
 
         updateCartBadge();
-
         renderCartPage();
-
         renderOrderSummary();
-
         togglePaymentDetails();
-
         updateProductSubtotal();
 
     }
+
 );
