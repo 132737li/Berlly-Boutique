@@ -2,7 +2,7 @@
    Berlly Boutique - Authentification
    ===================================================== */
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = "https://berlly-boutique.onrender.com";
 
 const USERS_KEY = 'berlly_users';
 const CURRENT_USER_KEY = 'berlly_current_user';

@@ -5,7 +5,7 @@ const CART_KEY = 'berlly_cart';
 
 const WHATSAPP_NUMBER = '25776672387'; // numéro WhatsApp de la boutique
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = "https://berlly-boutique.onrender.com";
 
 
 
