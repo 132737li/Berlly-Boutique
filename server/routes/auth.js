@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { verifyToken } = require('../middleware/verifyToken');
 
 // Inscription
 router.post('/register', async (req, res) => {
@@ -57,6 +58,7 @@ router.post('/login', async (req, res) => {
         id: utilisateur._id,
         nom: utilisateur.nom,
         email: utilisateur.email,
+        phone: utilisateur.phone,
         role: utilisateur.role
       }
     });
@@ -64,7 +66,6 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ message: 'Erreur serveur.', error: err.message });
   }
 });
-const { verifyToken } = require('../middleware/verifyToken');
 
 // Modifier son propre profil
 router.patch('/me', verifyToken, async (req, res) => {

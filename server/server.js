@@ -15,7 +15,7 @@ mongoose.connect(process.env.MONGO_URI)
 
 // Route de test
 app.get('/', (req, res) => {
-  res.send('Serveur Berlly-Boutique en ligne 🚀');
+  res.send('Serveur de Berlly-Boutique est en ligne ');
 });
 
 // Routes d'authentification
