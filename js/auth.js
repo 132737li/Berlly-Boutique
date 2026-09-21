@@ -2,7 +2,7 @@
    Berlly Boutique - Authentification
    ===================================================== */
 
-const API_BASE_URL = "https://berlly-boutique.onrender.com";
+const API_BASE_URL = 'https://berlly-boutique.onrender.com';
 
 const USERS_KEY = 'berlly_users';
 const CURRENT_USER_KEY = 'berlly_current_user';
@@ -557,30 +557,12 @@ function loadProfile() {
 
 
 /* =====================================================
-   MODIFICATION DU PROFIL
+   MODIFICATION DU PROFIL (connectée au backend)
    ===================================================== */
 
-function handleProfileUpdate(event) {
+async function handleProfileUpdate(event) {
 
     event.preventDefault();
-
-
-    const data =
-        localStorage.getItem(CURRENT_USER_KEY);
-
-
-    if (!data) {
-
-        window.location.href =
-            'connexion.html';
-
-        return;
-    }
-
-
-    const currentUser =
-        JSON.parse(data);
-
 
     const name =
         document.getElementById('profile-name')
@@ -593,41 +575,44 @@ function handleProfileUpdate(event) {
     const message =
         document.getElementById('profile-message');
 
+    message.textContent = 'Enregistrement en cours...';
 
-    const users = getUsers();
+    try {
 
+        const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('berlly_token')}`
+            },
+            body: JSON.stringify({
+                nom: name,
+                phone: phone
+            })
+        });
 
-    const index =
-        users.findIndex(
-            user => user.id === currentUser.id
-        );
+        const data = await response.json();
 
+        if (!response.ok) {
 
-    if (index === -1) {
+            message.textContent =
+                data.message || 'Erreur lors de la mise à jour.';
+
+            return;
+        }
+
+        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(data));
 
         message.textContent =
-            'Utilisateur introuvable.';
+            'Profil mis à jour avec succès !';
 
-        return;
+    } catch (err) {
+
+        message.textContent =
+            'Impossible de contacter le serveur.';
+
+        console.error(err);
     }
-
-
-    users[index].name = name;
-
-    users[index].phone = phone;
-
-
-    saveUsers(users);
-
-
-    localStorage.setItem(
-        CURRENT_USER_KEY,
-        JSON.stringify(users[index])
-    );
-
-
-    message.textContent =
-        'Profil mis à jour avec succès !';
 }
 
 
@@ -639,6 +624,10 @@ function logout() {
 
     localStorage.removeItem(
         CURRENT_USER_KEY
+    );
+
+    localStorage.removeItem(
+        'berlly_token'
     );
 
     window.location.href =
