@@ -6,28 +6,6 @@ const API_BASE_URL = 'https://berlly-boutique.onrender.com';
 
 const USERS_KEY = 'berlly_users';
 const CURRENT_USER_KEY = 'berlly_current_user';
-const RESET_EMAIL_KEY = 'berlly_reset_email';
-
-
-/* =====================================================
-   UTILITAIRES
-   ===================================================== */
-
-function getUsers() {
-
-    const data = localStorage.getItem(USERS_KEY);
-
-    return data ? JSON.parse(data) : [];
-}
-
-
-function saveUsers(users) {
-
-    localStorage.setItem(
-        USERS_KEY,
-        JSON.stringify(users)
-    );
-}
 
 
 /* =====================================================
@@ -186,10 +164,6 @@ async function handleRegister(event) {
         document.getElementById('register-email')
         .value.trim()
         .toLowerCase();
-
-    const phone =
-        document.getElementById('register-phone')
-        .value.trim();
 
     const password =
         document.getElementById('register-password')
@@ -359,13 +333,12 @@ async function handleLogin(event) {
 
 
 /* =====================================================
-   MOT DE PASSE OUBLIÉ
+   MOT DE PASSE OUBLIÉ (connectée au backend)
    ===================================================== */
 
-function handleForgotPassword(event) {
+async function handleForgotPassword(event) {
 
     event.preventDefault();
-
 
     const email =
         document.getElementById('forgot-email')
@@ -375,55 +348,40 @@ function handleForgotPassword(event) {
     const message =
         document.getElementById('forgot-message');
 
+    message.textContent = 'Envoi en cours...';
 
-    const users = getUsers();
+    try {
 
+        const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email })
+        });
 
-    const user =
-        users.find(user => user.email === email);
-
-
-    if (!user) {
+        const data = await response.json();
 
         message.textContent =
-            'Aucun compte trouvé avec cette adresse e-mail.';
+            data.message || 'Si ce compte existe, un email a été envoyé.';
 
-        return;
+    } catch (err) {
+
+        message.textContent =
+            'Impossible de contacter le serveur.';
+
+        console.error(err);
     }
-
-
-    /*
-       Pour notre version locale de démonstration,
-       on mémorise l'adresse e-mail à réinitialiser.
-    */
-
-    localStorage.setItem(
-        RESET_EMAIL_KEY,
-        email
-    );
-
-
-    message.textContent =
-        'Adresse trouvée. Vous pouvez créer un nouveau mot de passe.';
-
-
-    setTimeout(() => {
-
-        window.location.href =
-            'nouveau-mot-de-passe.html';
-
-    }, 1000);
 }
 
 
 /* =====================================================
-   NOUVEAU MOT DE PASSE
+   NOUVEAU MOT DE PASSE (connectée au backend)
    ===================================================== */
 
-function handleResetPassword(event) {
+async function handleResetPassword(event) {
 
     event.preventDefault();
-
 
     const password =
         document.getElementById('reset-password')
@@ -437,14 +395,14 @@ function handleResetPassword(event) {
         document.getElementById('reset-message');
 
 
-    const email =
-        localStorage.getItem(RESET_EMAIL_KEY);
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
 
 
-    if (!email) {
+    if (!token) {
 
         message.textContent =
-            'Aucune demande de réinitialisation trouvée.';
+            'Lien invalide. Veuillez refaire une demande de réinitialisation.';
 
         return;
     }
@@ -467,46 +425,48 @@ function handleResetPassword(event) {
         return;
     }
 
+    message.textContent = 'Modification en cours...';
 
-    const users = getUsers();
+    try {
 
+        const response = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                token: token,
+                motDePasse: password
+            })
+        });
 
-    const index =
-        users.findIndex(
-            user => user.email === email
-        );
+        const data = await response.json();
 
+        if (!response.ok) {
 
-    if (index === -1) {
+            message.textContent =
+                data.message || 'Erreur lors de la réinitialisation.';
+
+            return;
+        }
 
         message.textContent =
-            'Utilisateur introuvable.';
+            'Mot de passe modifié avec succès !';
 
-        return;
+        setTimeout(() => {
+
+            window.location.href =
+                'connexion.html';
+
+        }, 1200);
+
+    } catch (err) {
+
+        message.textContent =
+            'Impossible de contacter le serveur.';
+
+        console.error(err);
     }
-
-
-    users[index].password = password;
-
-
-    saveUsers(users);
-
-
-    localStorage.removeItem(
-        RESET_EMAIL_KEY
-    );
-
-
-    message.textContent =
-        'Mot de passe modifié avec succès !';
-
-
-    setTimeout(() => {
-
-        window.location.href =
-            'connexion.html';
-
-    }, 1200);
 }
 
 
