@@ -64,5 +64,27 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ message: 'Erreur serveur.', error: err.message });
   }
 });
+const { verifyToken } = require('../middleware/verifyToken');
+
+// Modifier son propre profil
+router.patch('/me', verifyToken, async (req, res) => {
+  try {
+    const { nom, phone } = req.body;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      { nom, phone },
+      { new: true }
+    ).select('-motDePasse');
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'Utilisateur introuvable.' });
+    }
+
+    res.json(updatedUser);
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur serveur.', error: err.message });
+  }
+});
 
 module.exports = router;
