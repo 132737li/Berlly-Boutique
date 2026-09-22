@@ -14,7 +14,10 @@
 
     if (unlocked !== 'true') {
 
-        sessionStorage.setItem('berlly_redirect_after_unlock', currentPage);
+        // On garde la page ET ses paramètres (ex: ?token=...)
+        const fullPath = currentPage + window.location.search;
+
+        sessionStorage.setItem('berlly_redirect_after_unlock', fullPath);
 
         window.location.href = 'verrouillage.html';
 
